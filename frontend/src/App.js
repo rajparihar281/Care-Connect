@@ -12,6 +12,7 @@ import "./App.css";
 import DashboardPage from "./pages/DashboardPage";
 import AppointmentPage from "./pages/AppointmentPage";
 import DoctorDashboard from "./pages/DoctorDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="health-notices" element={<HealthNotices />} />
           <Route path="auth" element={<AuthPages />} />
           <Route path="doctor-dashboard" element={<DoctorDashboard />} />
+          <Route path="admin-dashboard" element={<AdminDashboard />} />
         </Route>
 
         {/* Catch-all route to redirect to home page */}
