@@ -16,9 +16,12 @@ const Home = () => {
             place.
           </p>
           <div className="hero-buttons">
-            <a href="dashboard.html" className="btn btn-primary btn-large">
-              <i className="fas fa-th-large"></i> Go to Dashboard
-            </a>
+            <Link to="/dashboard">
+              <button className="btn btn-primary">
+                {" "}
+                <i className="fas fa-th-large"></i> Go to dashboard{" "}
+              </button>
+            </Link>
           </div>
         </div>
         <div className="hero-image">
@@ -134,18 +137,15 @@ const Home = () => {
         </div>
       </section>
       <Link to="/emergency-alert">
-          <a
+        <a
           href="emergency.html"
           className="floating-action-btn"
-        title="Emergency - SOS"
-      >
-      <i className="fas fa-phone-alt " ></i>
-         </a>
-
-              </Link>
-                {/* <button className="btn btn-primary">View Notices</button> */}
-     
-        
+          title="Emergency - SOS"
+        >
+          <i className="fas fa-phone-alt "></i>
+        </a>
+      </Link>
+      {/* <button className="btn btn-primary">View Notices</button> */}
     </>
   );
 };
