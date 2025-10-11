@@ -189,29 +189,6 @@ const AppointmentPage = () => {
 
   return (
     <div className={styles.body}>
-      {/* Navbar */}
-      <nav className={styles.navbar}>
-        <div className={styles.navContainer}>
-          <div className={styles.logo}>
-            <i className="fas fa-heartbeat"></i>
-            <span>Care Connect</span>
-          </div>
-          <div className={styles.navLinks}>
-            <a href="/">Home</a>
-            <a href="/doctors">Doctors</a>
-            <a href="/symptom-checker">Symptom Checker</a>
-            <a href="/health-notices">Health Notices</a>
-          </div>
-          <div className={styles.userProfile}>
-            <img
-              src="https://ui-avatars.com/api/?name=John+Doe&background=0D9488&color=fff"
-              alt="User"
-            />
-            <span>John Doe</span>
-          </div>
-        </div>
-      </nav>
-
       {/* Main Container */}
       <div className={styles.mainContainer}>
         <div className={styles.pageHeader}>

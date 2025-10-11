@@ -6,7 +6,6 @@ import Layout from "./components/Layout";
 import EmergencyAlert from "./pages/EmergencyAlert";
 import Home from "./pages/Home";
 import SymptomChecker from "./pages/DiseasePredictor";
-import Appointment from "./pages/Appointment";
 import HealthNotices from "./pages/HealthNotices";
 import AuthPages from "./pages/AuthPages";
 import "./App.css";
@@ -16,6 +15,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import DashboardPage from "./pages/DashboardPage";
+import AppointmentPage from "./pages/AppointmentPage";
 
 function App() {
   return (
@@ -38,7 +38,7 @@ function App() {
               <Route index element={<Home />} />
               <Route path="symptom-checker" element={<SymptomChecker />} />
               <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="appointment" element={<Appointment />} />
+              <Route path="appointment" element={<AppointmentPage />} />
                   <Route path="emergency-alert" element={<EmergencyAlert />} />
               <Route path="health-notices" element={<HealthNotices />} />
             </Route>
