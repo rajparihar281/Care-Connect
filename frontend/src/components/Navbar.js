@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import './Navbar.css'
 const Navbar = ({ theme, toggleTheme }) => {
@@ -40,7 +40,7 @@ const Navbar = ({ theme, toggleTheme }) => {
               <Link to="/symptom-checker">Symptom Checker</Link>
             </li>
             <li>
-              <Link to="/health-notices">Health Notices</Link>
+              <Link to="http://127.0.0.1:5000/  ">Health Notices</Link>
             </li>
           </>
         </ul>
