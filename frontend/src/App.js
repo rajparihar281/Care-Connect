@@ -31,7 +31,7 @@ function App() {
           <Route path="admin-dashboard" element={<AdminDashboard />} />
         </Route>
 
-        {/* Catch-all route to redirect to home page */}
+        {}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
