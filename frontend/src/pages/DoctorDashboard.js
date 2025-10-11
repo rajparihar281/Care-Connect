@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "../supabaseClient";
 import "./DoctorDashboard.css";
-
+import { Link } from "react-router-dom";
 const DOCTOR_ID = "550e8400-e29b-41d4-a716-446655440001";
 
 const DoctorDashboard = () => {
@@ -191,7 +191,7 @@ const DoctorDashboard = () => {
     document.documentElement.classList.toggle("dark", newMode);
     showToast(`${newMode ? "Dark" : "Light"} mode activated`);
   };
-
+  
   const derivedPatientsWithHistory = useMemo(() => {
     if (patients.length === 0) return [];
 
@@ -362,47 +362,55 @@ const DoctorDashboard = () => {
                   </thead>
                   <tbody>
                     {appointments.map((apt) => (
-                      <tr key={apt.id}>
-                        <td>{apt.patients?.full_name || "Unknown Patient"}</td>
-                        <td>
-                          {formatDate(apt.appointment_date)} at{" "}
-                          {formatTime24to12(apt.appointment_time)}
-                        </td>
-                        <td>{apt.mode}</td>
-                        <td>
-                          <span className={`badge badge-${apt.status}`}>
-                            {apt.status}
-                          </span>
-                        </td>
-                        <td>
-                          {apt.status === "upcoming" && (
-                            <>
-                              <button
-                                onClick={() =>
-                                  handleAppointmentStatusUpdate(
-                                    apt.id,
-                                    "completed"
-                                  )
-                                }
-                                className="text-green-600"
-                              >
-                                Complete
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleAppointmentStatusUpdate(
-                                    apt.id,
-                                    "cancelled"
-                                  )
-                                }
-                                className="text-red-600"
-                              >
-                                Cancel
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
+                      <>
+                        {" "}
+                        <tr key={apt.id}>
+                          <td>
+                            {apt.patients?.full_name || "Unknown Patient"}
+                          </td>
+                          <td>
+                            {formatDate(apt.appointment_date)} at{" "}
+                            {formatTime24to12(apt.appointment_time)}
+                          </td>
+                          <Link to="http://localhost:8081/">
+                            {" "}
+                            <td>{apt.mode}</td>{" "}
+                          </Link>
+                          <td>
+                            <span className={`badge badge-${apt.status}`}>
+                              {apt.status}
+                            </span>
+                          </td>
+                          <td>
+                            {apt.status === "upcoming" && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handleAppointmentStatusUpdate(
+                                      apt.id,
+                                      "completed"
+                                    )
+                                  }
+                                  className="btn-primary"
+                                >
+                                  Complete
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleAppointmentStatusUpdate(
+                                      apt.id,
+                                      "cancelled"
+                                    )
+                                  }
+                                  className="btn-primary "
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      </>
                     ))}
                   </tbody>
                 </table>
@@ -510,9 +518,7 @@ const DoctorDashboard = () => {
       {isModalOpen.markComplete && (
         <div
           className="modal show"
-          onClick={() =>
-            setModalOpen({ ...isModalOpen, markComplete: false })
-          }
+          onClick={() => setModalOpen({ ...isModalOpen, markComplete: false })}
         >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>Mark Appointment Complete</h3>
@@ -534,7 +540,7 @@ const DoctorDashboard = () => {
                     } - ${formatDate(a.appointment_date)}`}</option>
                   ))}
               </select>
-              <button type="submit" className="btn btn-primary mt-4">
+              <button type="submit" className="btn-primary">
                 Mark Complete
               </button>
             </form>
@@ -545,9 +551,7 @@ const DoctorDashboard = () => {
       {isModalOpen.prescription && (
         <div
           className="modal show"
-          onClick={() =>
-            setModalOpen({ ...isModalOpen, prescription: false })
-          }
+          onClick={() => setModalOpen({ ...isModalOpen, prescription: false })}
         >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>New Prescription</h3>
@@ -588,9 +592,7 @@ const DoctorDashboard = () => {
       {isModalOpen.patientDetail && selectedPatient && (
         <div
           className="modal show"
-          onClick={() =>
-            setModalOpen({ ...isModalOpen, patientDetail: false })
-          }
+          onClick={() => setModalOpen({ ...isModalOpen, patientDetail: false })}
         >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>History for {selectedPatient.full_name}</h3>
