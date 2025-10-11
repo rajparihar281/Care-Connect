@@ -1,0 +1,17 @@
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 16px 24px;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateX(calc(100% + 20px));
+    transition: transform 0.4s ease-in-out;
+    z-index: 1000;
+    border-left: 4px solid #0D9488; /* Tailwind: border-l-4 border-teal-600 */
+}
+
+.toast.show {
+    transform: translateX(0);
+}
