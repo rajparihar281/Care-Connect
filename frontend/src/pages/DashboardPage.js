@@ -485,34 +485,46 @@ const DashboardPage = () => {
                 appointments.map((appointment) => (
                   <div key={appointment.id} className="card">
                     <div className="card-header">
-                      <h3>{`Dr. ID ${appointment.doctor_id}`}</h3>
-                      {appointment.mode === "Video Call" ? (
-                        <Video className="icon" />
-                      ) : (
-                        <Hospital className="icon" />
+                      <h3>
+                        Dr. {appointment.doctor_id.split("-")[0].toUpperCase()}
+                      </h3>
+                      {appointment.mode === "video-call" && (
+                        <Link to="http://localhost:8081/">
+                          <Video className="icon" />
+                        </Link>
                       )}
                     </div>
-                    <p className="specialty">{appointment.specialty}</p>
-                    <div className="appointment-details">
-                      <p>
-                        <span>Date:</span>{" "}
-                        {formatDate(appointment.appointment_date)}
-                      </p>
-                      <p>
-                        <span>Time:</span> {appointment.appointment_time}
-                      </p>
-                      <p>
-                        <span>Mode:</span> {appointment.mode}
-                      </p>
-                      <p>
-                        <span>Reason:</span>{" "}
-                        {appointment.reason || "Not specified"}
-                      </p>
+
+                    <div className="card-body">
+                      <div className="appointment-detail">
+                        <strong>Date:</strong>{" "}
+                        {new Date(appointment.date).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          }
+                        )}
+                      </div>
+
+                      <div className="appointment-detail">
+                        <strong>Time:</strong> {appointment.time}
+                      </div>
+
+                      <div className="appointment-detail">
+                        <strong>Mode:</strong>{" "}
+                        {appointment.mode
+                          .replace("-", " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </div>
+
+                      <div className="appointment-detail">
+                        <strong>Reason:</strong> {appointment.reason}
+                      </div>
                     </div>
-                    <button
-                      className="btn-secondary"
-                      onClick={() => cancelAppointment(appointment.id)}
-                    >
+
+                    <button className="btn-secondary" onClick={() => {}}>
                       Cancel Appointment
                     </button>
                   </div>
