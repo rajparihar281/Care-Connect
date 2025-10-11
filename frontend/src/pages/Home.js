@@ -30,8 +30,46 @@ const Home = () => {
             viewBox="0 0 500 400"
             xmlns="http://www.w3.org/2000/svg"
           >
+            {/* Background circles */}
             <circle cx="250" cy="200" r="180" fill="#E0F2FE" opacity="0.5" />
             <circle cx="250" cy="200" r="150" fill="#BAE6FD" opacity="0.5" />
+
+            {/* Plus signs with white stroke */}
+            <text
+              x="150"
+              y="100"
+              fontSize="30"
+              fill="#14B8A6"
+              fontWeight="bold"
+              strokeWidth="2"
+              stroke="white"
+            >
+              +
+            </text>
+            <text
+              x="350"
+              y="120"
+              fontSize="30"
+              fill="#14B8A6"
+              fontWeight="bold"
+              strokeWidth="2"
+              stroke="white"
+            >
+              +
+            </text>
+            <text
+              x="120"
+              y="250"
+              fontSize="30"
+              fill="#14B8A6"
+              fontWeight="bold"
+              strokeWidth="2"
+              stroke="white"
+            >
+              +
+            </text>
+
+            {/* Other SVG elements */}
             <rect
               x="180"
               y="150"
@@ -63,33 +101,6 @@ const Home = () => {
               d="M370 180 C370 170, 380 160, 390 160 C400 160, 410 170, 410 180 C410 170, 420 160, 430 160 C440 160, 450 170, 450 180 Q450 210, 410 240 Q370 210, 370 180"
               fill="#EF4444"
             />
-            <text
-              x="150"
-              y="100"
-              fontSize="30"
-              fill="#14B8A6"
-              fontWeight="bold"
-            >
-              +
-            </text>
-            <text
-              x="350"
-              y="120"
-              fontSize="30"
-              fill="#14B8A6"
-              fontWeight="bold"
-            >
-              +
-            </text>
-            <text
-              x="120"
-              y="250"
-              fontSize="30"
-              fill="#14B8A6"
-              fontWeight="bold"
-            >
-              +
-            </text>
           </svg>
         </div>
       </section>
@@ -111,14 +122,16 @@ const Home = () => {
                 <button className="btn btn-primary">Try Symptom Checker</button>
               </Link>
             </div>
+
             <div className="feature-card">
               <div className="feature-icon">
                 <i className="fas fa-calendar-alt"></i>
               </div>
-              <h3>Book Appointments</h3>
+              <h3>Book Appointment</h3>
               <p>
                 Consult with doctors online or offline as per your preference...
               </p>
+
               <Link to="/appointment">
                 <button className="btn btn-primary">Book Now</button>
               </Link>

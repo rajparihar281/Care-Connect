@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+// import './EmergencyAlert.css'
 function EmergencyAlert() {
   const [statusText, setStatusText] = useState('Ready to send emergency alert');
   const [locationInfo, setLocationInfo] = useState('');
