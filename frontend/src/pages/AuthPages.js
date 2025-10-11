@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 function AuthPages() {
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [isSignIn, setIsSignIn] = useState(true);
+  const [currentRole, setCurrentRole] = useState("user");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,6 +16,7 @@ function AuthPages() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,21 +24,11 @@ function AuthPages() {
       ...formData,
       [name]: type === "checkbox" ? checked : value,
     });
+    setError(""); // Clear error on input change
   };
 
   const handleSubmit = () => {
-    if (isSignIn) {
-      // In a real app, you'd get user data from an API response.
-      // We'll create a mock user object for now.
-      const userData = { name: formData.email.split("@")[0] || "User" };
-      login(userData);
-      navigate("/"); // Redirect to the home page after login
-    } else {
-      // After sign up, log the user in directly with their name from the form
-      const userData = { name: formData.name || "New User" };
-      login(userData);
-      navigate("/"); // Redirect to the home page after sign-up
-    }
+    navigate("/");
   };
 
   const toggleAuthMode = () => {
@@ -51,6 +41,7 @@ function AuthPages() {
       phone: "",
       agreeToTerms: false,
     });
+    setError("");
   };
 
   const styles = {
@@ -227,6 +218,12 @@ function AuthPages() {
       color: "#6B7280",
       fontSize: "0.9rem",
     },
+    error: {
+      color: "#EF4444",
+      fontSize: "0.9rem",
+      marginBottom: "1rem",
+      textAlign: "center",
+    },
   };
 
   return (
@@ -271,7 +268,41 @@ function AuthPages() {
 
         {/* Form Container */}
         <div style={styles.formContainer}>
-          {/* Tabs */}
+          {/* Role Tabs */}
+          <div style={styles.tabContainer}>
+            <button
+              style={{
+                ...styles.tab,
+                ...(currentRole === "user" ? styles.tabActive : {}),
+              }}
+              className="tab"
+              onClick={() => setCurrentRole("user")}
+            >
+              User
+            </button>
+            <button
+              style={{
+                ...styles.tab,
+                ...(currentRole === "doctor" ? styles.tabActive : {}),
+              }}
+              className="tab"
+              onClick={() => setCurrentRole("doctor")}
+            >
+              Doctor
+            </button>
+            <button
+              style={{
+                ...styles.tab,
+                ...(currentRole === "admin" ? styles.tabActive : {}),
+              }}
+              className="tab"
+              onClick={() => setCurrentRole("admin")}
+            >
+              Admin
+            </button>
+          </div>
+
+          {/* Sign In/Sign Up Tabs */}
           <div style={styles.tabContainer}>
             <button
               style={{
@@ -294,6 +325,9 @@ function AuthPages() {
               Sign Up
             </button>
           </div>
+
+          {/* Error Message */}
+          {error && <div style={styles.error}>{error}</div>}
 
           {/* Form Fields */}
           <div>
@@ -336,7 +370,7 @@ function AuthPages() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  placeholder="Enter your phone number"
+                  placeholder="Enter your phone number (optional)"
                   style={styles.input}
                 />
               </div>

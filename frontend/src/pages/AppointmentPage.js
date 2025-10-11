@@ -86,7 +86,7 @@ const initialDoctors = [
 
 const AppointmentPage = () => {
   const navigate = useNavigate();
-  const [doctors, setDoctors] = useState(initialDoctors);
+  const [doctors] = useState(initialDoctors);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
