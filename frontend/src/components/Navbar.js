@@ -1,14 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-
 const Navbar = ({ theme, toggleTheme }) => {
   const [isMenuOpen] = useState(false);
   const navbarRef = useRef(null);
   const navigate = useNavigate();
-
-  // Get the user object from the context
-  const { isAuthenticated, logout, user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,10 +19,6 @@ const Navbar = ({ theme, toggleTheme }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLogout = () => {
-    logout();
-  };
-
   const handleLoginClick = () => {
     navigate("/auth");
   };
@@ -40,7 +31,6 @@ const Navbar = ({ theme, toggleTheme }) => {
           Care Connect
         </Link>
         <ul className={isMenuOpen ? "nav-links active" : "nav-links"}>
-          {isAuthenticated && (
             <>
               <li>
                 <Link to="/">Home</Link>
@@ -55,28 +45,25 @@ const Navbar = ({ theme, toggleTheme }) => {
                 <Link to="/health-notices">Health Notices</Link>
               </li>
             </>
-          )}
+
         </ul>
         <div className="nav-buttons">
           <button className="theme-toggle" onClick={toggleTheme}>
             <i className={theme === "dark" ? "fas fa-sun" : "fas fa-moon"}></i>
           </button>
 
-          {isAuthenticated ? (
+        
             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
               <span style={{ color: "var(--text)", fontWeight: "500" }}>
-                {/* --- THIS IS THE CHANGE --- */}
-                Welcome, {user ? user.name : "User"}!
+                Welcome
               </span>
-              <button className="btn btn-secondary" onClick={handleLogout}>
-                Logout
-              </button>
+          
             </div>
-          ) : (
+       
             <button className="btn btn-primary" onClick={handleLoginClick}>
               Login / Sign Up
             </button>
-          )}
+      
         </div>
       </div>
     </nav>
