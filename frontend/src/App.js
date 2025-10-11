@@ -11,6 +11,7 @@ import AuthPages from "./pages/AuthPages";
 import "./App.css";
 import DashboardPage from "./pages/DashboardPage";
 import AppointmentPage from "./pages/AppointmentPage";
+import DoctorDashboard from "./pages/DoctorDashboard";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="emergency-alert" element={<EmergencyAlert />} />
           <Route path="health-notices" element={<HealthNotices />} />
           <Route path="auth" element={<AuthPages />} />
+          <Route path="doctor-dashboard" element={<DoctorDashboard />} />
         </Route>
 
         {/* Catch-all route to redirect to home page */}

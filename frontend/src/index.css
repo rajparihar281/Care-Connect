@@ -10,9 +10,9 @@
   --border: #E5E7EB;
 }
 
-[data-theme="dark"] {
+[data-theme="light"] {
   --background: #111827;
-  --text: #F9FAFB;
+  --text: #03000000;
   --text-light: #9CA3AF;
   --white: #1F2937;
   --shadow: rgba(0, 0, 0, 0.3);

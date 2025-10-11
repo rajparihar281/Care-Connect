@@ -1,0 +1,424 @@
+/* ==========================================================================
+   1. Global Styles & CSS Variables
+   ========================================================================== */
+
+/* Defines semantic variables for both light and dark themes.
+  The dark theme just redefines these variables.
+*/
+:root {
+  /* Colors */
+  --clr-primary-400: #14B8A6;
+  --clr-primary-500: #0D9488;
+  
+  /* Light Theme Palette (Default) */
+  --bg-main: #F9FAFB;      /* Main page background */
+  --bg-surface: #FFFFFF;    /* Card, sidebar, modal backgrounds */
+  --bg-input: #FFFFFF;      /* Form input backgrounds */
+  --clr-border: #E5E7EB;    /* Borders and dividers */
+  --clr-text-primary: #111827;
+  --clr-text-secondary: #6B7280;
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  
+  /* Transitions */
+  --transition-fast: all 150ms ease-in-out;
+}
+
+/* Dark mode variable overrides */
+.dark {
+  --bg-main: #111827;
+  --bg-surface: #1F2937;
+  --bg-input: #374151;
+  --clr-border: #374151;
+  --clr-text-primary: #F9FAFB;
+  --clr-text-secondary: #9CA3AF;
+}
+
+/* Basic Reset & Font Smoothing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-main);
+  color: var(--clr-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--clr-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--clr-text-secondary);
+}
+
+/* ==========================================================================
+   2. Layout & Main Components
+   ========================================================================== */
+
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* Prevent body scroll */
+}
+
+.sidebar {
+  width: 16rem;
+  background-color: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--clr-border);
+  flex-shrink: 0; /* Prevent sidebar from shrinking */
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   3. Sidebar Styles
+   ========================================================================== */
+
+.sidebar-profile {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.sidebar-profile .brand {
+  color: var(--clr-primary-500);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.sidebar-profile .doctor-name {
+  font-size: 1rem; /* Increased size for better readability */
+  color: var(--clr-text-primary); /* Use primary text color */
+  margin-top: 0.5rem;
+}
+.sidebar-profile .doctor-specialty {
+  font-size: 0.875rem; /* Increased size */
+  color: var(--clr-text-secondary);
+  margin-top: 0.25rem;
+}
+
+.sidebar-nav {
+  flex-grow: 1; /* Changed from flex: 1 */
+  padding: 1.5rem 1rem;
+}
+.sidebar-nav > *:not([hidden]) ~ *:not([hidden]) {
+  margin-top: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem; /* Increased padding */
+  border-radius: 0.5rem;
+  transition: var(--transition-fast);
+  text-decoration: none;
+  color: var(--clr-text-secondary); /* Default state is secondary color */
+  background-color: transparent;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+}
+.nav-item:hover,
+.nav-item:focus-visible {
+  background-color: rgba(13, 148, 136, 0.1);
+  color: var(--clr-primary-500);
+  outline: none;
+}
+.nav-item.active {
+  background-color: rgba(13, 148, 136, 0.1);
+  color: var(--clr-primary-500);
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid var(--clr-border);
+}
+
+/* ==========================================================================
+   4. Main Content: Header & Stat Cards
+   ========================================================================== */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 1rem;
+}
+
+.page-header h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 0;
+}
+.page-header .subtitle,
+.page-header .date-time {
+  color: var(--clr-text-secondary);
+  margin-top: 0.25rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* More responsive grid */
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: var(--bg-surface);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid var(--clr-border);
+}
+.stat-card .stat-title {
+  font-size: 0.875rem;
+  color: var(--clr-text-secondary);
+}
+.stat-card .stat-value {
+  font-size: 1.75rem; /* Slightly larger for emphasis */
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   5. Content Cards & Tables
+   ========================================================================== */
+
+.content-card {
+  background-color: var(--bg-surface);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  border: 1px solid var(--clr-border);
+}
+
+.data-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.data-table thead th {
+  border-bottom: 2px solid var(--clr-border); /* Thicker border */
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--clr-text-secondary);
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--clr-border);
+  transition: background-color 150ms;
+}
+.data-table tbody tr:last-child {
+  border-bottom: none; /* Remove border on last row */
+}
+.data-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+.dark .data-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================================================
+   6. Form Elements, Buttons & Toggles
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem; /* Adjusted padding */
+  border-radius: 0.5rem;
+  transition: var(--transition-fast);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.btn-primary {
+  background-color: var(--clr-primary-500);
+  color: white;
+}
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background-color: var(--clr-primary-400);
+  outline: none;
+}
+
+.input, .select, .textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--clr-border);
+  background-color: var(--bg-input);
+  color: var(--clr-text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: var(--transition-fast);
+}
+.input:focus, .select:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--clr-primary-500);
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Availability Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px; /* w-11 */
+  height: 24px; /* h-6 */
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.track {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  border-radius: 24px;
+  transition: var(--transition-fast);
+}
+.track:before {
+  position: absolute;
+  content: "";
+  height: 20px; /* h-5 */
+  width: 20px; /* w-5 */
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: var(--transition-fast);
+}
+.dark .track {
+  background-color: #374151;
+}
+input:checked + .track {
+  background-color: var(--clr-primary-500);
+}
+input:checked + .track:before {
+  transform: translateX(20px);
+}
+
+/* ==========================================================================
+   7. Modals, Toasts, Badges & Utilities
+   ========================================================================== */
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+.modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+.modal-content {
+  background-color: var(--bg-surface);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  max-width: 28rem;
+  width: 90%;
+  animation: fadeIn 0.2s ease-out; /* Add animation to content */
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 20px; /* Changed to bottom for better UX */
+  right: 20px;
+  background: var(--bg-surface);
+  padding: 1rem 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(150%); /* Start from bottom */
+  transition: transform 0.3s ease-in-out;
+  z-index: 1001;
+  border-left: 4px solid var(--clr-primary-500);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.toast.show {
+  transform: translateY(0);
+}
+
+/* Status Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.badge-upcoming { background: #fef3c7; color: #92400e; }
+.badge-completed { background: #dcfce7; color: #166534; }
+.badge-cancelled { background: #fee2e2; color: #991b1b; }
+.dark .badge-upcoming { background: #713f12; color: #fde047; }
+.dark .badge-completed { background: #14532d; color: #86efac; }
+.dark .badge-cancelled { background: #7f1d1d; color: #fca5a5; }

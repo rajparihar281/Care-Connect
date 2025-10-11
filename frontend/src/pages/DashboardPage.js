@@ -1,401 +1,712 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {
+  Calendar,
+  Heart,
+  User,
+  LogOut,
+  Video,
+  Hospital,
+  Lightbulb,
+  Activity,
+  Egg,
+  Moon,
+  Plus,
+  X,
+  CheckCircle,
+  Search,
+  Sparkles,
+  Pill,
+} from "lucide-react";
+import "./DashboardPage.css";
+import { createClient } from "@supabase/supabase-js";
+import { Link } from "react-router-dom";
+
+// Supabase Client Configuration
+const supabaseUrl = "https://kttmrlnuaxrmknuizddc.supabase.co";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0dG1ybG51YXhybWtudWl6ZGRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMjcwMDYsImV4cCI6MjA3NTYwMzAwNn0.Qh5gEm9xdvtzrnS1o4iXfZWySH3_lSIvMiDA2-aHum8";
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// In a real app, you would get the current user's ID from authentication.
+// For this example, we'll hardcode a UUID that exists in your database.
+const currentPatientId = "550e8400-e29b-41d4-a716-446655440003"; // Example: Jane Smith's ID from your SQL
 
 const DashboardPage = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [appointments, setAppointments] = useState([]);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [pastVisits, setPastVisits] = useState([]);
+  const [userData, setUserData] = useState({
+    name: "Loading...",
+    email: "...",
+    phone: "...",
+    dob: "",
+    bloodType: "A+",
+    patientId: "...",
+  });
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "" });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [healthTips, setHealthTips] = useState([]);
 
-  // Load data from localStorage on component mount
+  const allHealthTips = [
+    {
+      icon: <Lightbulb />,
+      title: "Stay Hydrated",
+      description: "Drink at least 8 glasses of water a day.",
+    },
+    {
+      icon: <Activity />,
+      title: "Daily Exercise",
+      description: "Aim for 30 minutes of moderate activity.",
+    },
+    {
+      icon: <Egg />,
+      title: "Balanced Diet",
+      description: "Include a variety of fruits and vegetables.",
+    },
+    {
+      icon: <Moon />,
+      title: "Quality Sleep",
+      description: "Get 7-9 hours of sleep each night.",
+    },
+    {
+      icon: <Sparkles />,
+      title: "Stress Management",
+      description: "Practice meditation or deep breathing.",
+    },
+    {
+      icon: <Pill />,
+      title: "Regular Checkups",
+      description: "Visit your doctor for preventive care.",
+    },
+  ];
+
+  const doctors = [
+    {
+      value: "Dr. Sarah Johnson|Cardiologist",
+      label: "Dr. Sarah Johnson - Cardiologist",
+    },
+    {
+      value: "Dr. Michael Chen|Dermatologist",
+      label: "Dr. Michael Chen - Dermatologist",
+    },
+    {
+      value: "Dr. Emily Williams|Pediatrician",
+      label: "Dr. Emily Williams - Pediatrician",
+    },
+    {
+      value: "Dr. David Brown|Neurologist",
+      label: "Dr. David Brown - Neurologist",
+    },
+    {
+      value: "Dr. Lisa Anderson|General Physician",
+      label: "Dr. Lisa Anderson - General Physician",
+    },
+    {
+      value: "Dr. James Wilson|Orthopedic Surgeon",
+      label: "Dr. James Wilson - Orthopedic Surgeon",
+    },
+  ];
+
   useEffect(() => {
-    const savedAppointments =
-      JSON.parse(localStorage.getItem("appointments")) || [];
-    setAppointments(savedAppointments);
+    fetchUserData();
+    fetchAppointments();
+    fetchPastVisits();
+    refreshHealthTips();
+  }, []);
 
-    // Check for new booking flag from URL to show toast
-    const params = new URLSearchParams(location.search);
-    if (params.get("newBooking")) {
-      displayToast("New appointment booked successfully!");
-      // Clean up URL
-      navigate("/dashboard", { replace: true });
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const fetchUserData = async () => {
+    // Fetches from 'patients' table using the correct UUID
+    const { data, error } = await supabase
+      .from("patients")
+      .select("*")
+      .eq("id", currentPatientId)
+      .single();
+
+    if (data && !error) {
+      setUserData({
+        // Assuming your 'patients' table has these columns
+        name: `${data.first_name} ${data.last_name}`,
+        email: data.email,
+        phone: data.phone_number,
+        dob: data.date_of_birth,
+        bloodType: data.blood_type,
+        patientId: data.id,
+      });
+    } else {
+      console.error("Error fetching patient data:", error);
     }
-  }, [location.search, navigate]);
-
-  const displayToast = (message) => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handleNavClick = (section) => {
-    setActiveSection(section);
+  const fetchAppointments = async () => {
+    // Fetches using 'patient_id' and the UUID, ordering by 'appointment_date'
+    const { data, error } = await supabase
+      .from("appointments")
+      .select("*")
+      .eq("patient_id", currentPatientId)
+      .order("appointment_date", { ascending: true });
+
+    if (data && !error) {
+      setAppointments(data);
+    } else {
+      console.error("Error fetching appointments:", error);
+    }
   };
 
-  const cancelAppointment = (id) => {
-    if (window.confirm("Are you sure you want to cancel this appointment?")) {
-      const updatedAppointments = appointments.filter((a) => a.id !== id);
-      setAppointments(updatedAppointments);
-      localStorage.setItem("appointments", JSON.stringify(updatedAppointments));
-      displayToast("Appointment cancelled successfully.");
+  const fetchPastVisits = async () => {
+    // Fetches from 'medical_records' table
+    const { data, error } = await supabase
+      .from("medical_records")
+      .select("*")
+      .eq("patient_id", currentPatientId)
+      .order("visit_date", { ascending: false });
+
+    if (data && !error) {
+      // Map fields to match what the history table component expects
+      const formattedVisits = data.map((record) => ({
+        id: record.id,
+        doctor: `Dr. ID ${record.doctor_id}`, // In a real app, join to get the name
+        type: record.diagnosis,
+        date: record.visit_date,
+        notes: record.symptoms || record.treatment_plan,
+      }));
+      setPastVisits(formattedVisits);
+    } else {
+      console.error("Error fetching past visits:", error);
     }
+  };
+
+  const refreshHealthTips = () => {
+    const shuffled = [...allHealthTips]
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 3);
+    setHealthTips(shuffled);
   };
 
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    const userTimezoneDate = new Date(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate()
-    );
-    const options = { month: "short", day: "numeric", year: "numeric" };
-    return userTimezoneDate.toLocaleDateString("en-US", options);
+    if (!dateStr) return "";
+    const options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    };
+    return new Date(dateStr).toLocaleDateString("en-US", options);
   };
 
-  // --- Render Functions for Each Section ---
+  const formatDateTime = (date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
-  const renderDashboard = () => {
-    const upcoming = appointments
-      .filter((a) => new Date(`${a.date}T${a.time}`) >= new Date())
+  const showToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  };
+
+  const handleBookAppointment = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const [doctor, specialty] = formData.get("doctor").split("|");
+
+    const newAppointment = {
+      patient_id: currentPatientId,
+      // NOTE: Your schema expects a doctor_id (UUID). Inserting a name will fail
+      // if the column type is UUID. This is a simplification for the example.
+      // You would need to fetch doctors with their IDs to do this properly.
+      appointment_date: formData.get("date"),
+      appointment_time: formData.get("time"),
+      mode: formData.get("mode"),
+      reason: formData.get("reason") || "General consultation",
+      status: "upcoming",
+    };
+
+    const { error } = await supabase
+      .from("appointments")
+      .insert([newAppointment]);
+
+    if (!error) {
+      fetchAppointments();
+      setShowBookingModal(false);
+      showToast("Appointment booked successfully!");
+    } else {
+      console.error("Error booking appointment:", error);
+      showToast(`Booking failed: ${error.message}`);
+    }
+  };
+
+  const cancelAppointment = async (id) => {
+    if (window.confirm("Are you sure you want to cancel this appointment?")) {
+      const { error } = await supabase
+        .from("appointments")
+        .delete()
+        .eq("id", id);
+      if (!error) {
+        fetchAppointments();
+        showToast("Appointment cancelled successfully.");
+      }
+    }
+  };
+
+  const updateProfile = async (e) => {
+    e.preventDefault();
+    // This function assumes your 'patients' table has these specific columns.
+    // Adjust formData.get() names and the update object to match your schema.
+    const formData = new FormData(e.target);
+    const [firstName, ...lastName] = formData.get("name").split(" ");
+
+    const { error } = await supabase
+      .from("patients")
+      .update({
+        first_name: firstName,
+        last_name: lastName.join(" "),
+        email: formData.get("email"),
+        phone_number: formData.get("phone"),
+        date_of_birth: formData.get("dob"),
+        blood_type: formData.get("bloodType"),
+      })
+      .eq("id", currentPatientId);
+
+    if (!error) {
+      fetchUserData();
+      showToast("Profile updated successfully!");
+    }
+  };
+
+  const getUpcomingAppointment = () => {
+    const now = new Date();
+    return appointments
+      .filter(
+        (a) => new Date(`${a.appointment_date}T${a.appointment_time}`) >= now
+      )
       .sort(
         (a, b) =>
-          new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${a.time}`)
+          new Date(`${a.appointment_date}T${a.appointment_time}`) -
+          new Date(`${b.appointment_date}T${b.appointment_time}`)
       )[0];
-
-    return (
-      <div>
-        <header className="mb-8">
-          <h2 className="text-4xl font-bold text-teal-800">Welcome,</h2>
-          <p className="text-gray-500 mt-1">
-            Track your appointments and health history easily.
-          </p>
-        </header>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between card-hover">
-            {upcoming ? (
-              <>
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-teal-800">
-                      Upcoming Appointment
-                    </h3>
-                    <span className="material-symbols-outlined text-teal-500">
-                      {upcoming.mode === "Video Call"
-                        ? "videocam"
-                        : "local_hospital"}
-                    </span>
-                  </div>
-                  <p className="text-2xl font-bold text-teal-600">
-                    {upcoming.doctor}
-                  </p>
-                  <p className="text-gray-500">{upcoming.specialty}</p>
-                </div>
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-500">
-                    Date:{" "}
-                    <span className="font-medium text-teal-800">
-                      {formatDate(upcoming.date)}, {upcoming.time}
-                    </span>
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Mode:{" "}
-                    <span className="font-medium text-teal-800">
-                      {upcoming.mode}
-                    </span>
-                  </p>
-                </div>
-              </>
-            ) : (
-              <div>
-                <h3 className="text-lg font-semibold text-teal-800">
-                  No Upcoming Appointments
-                </h3>
-                <p className="text-gray-500 mt-2">
-                  You're all clear for now. Book a new appointment when you need
-                  one.
-                </p>
-              </div>
-            )}
-            <button
-              className="w-full mt-4 bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-500 transition-colors"
-              onClick={() => setActiveSection("appointments")}
-            >
-              View All Appointments
-            </button>
-          </div>
-          {/* Other dashboard cards can go here */}
-        </div>
-      </div>
-    );
   };
 
-  const renderAppointments = () => {
-    return (
-      <div>
-        <header className="mb-8 flex justify-between items-center">
-          <div>
-            <h2 className="text-4xl font-bold text-teal-800">Appointments</h2>
-            <p className="text-gray-500 mt-1">
-              Manage your upcoming and past appointments.
-            </p>
+  const filteredHistory = [
+    ...pastVisits,
+    ...appointments.map((a) => ({ ...a, date: a.appointment_date })),
+  ].filter(
+    (item) =>
+      item.doctor?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.type || item.specialty)
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      formatDate(item.date).toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const upcomingAppointment = getUpcomingAppointment();
+
+  return (
+    <div className="dashboard-container">
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="logo">
+          <div className="logo-icon">
+            <Hospital />
           </div>
-          <button
-            className="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-500 transition-colors flex items-center gap-2"
-            onClick={() => navigate("/appointment")}
+          <h1>Care Connect</h1>
+        </div>
+        <nav className="nav">
+          <a
+            className={`nav-link ${
+              activeSection === "dashboard" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("dashboard")}
           >
-            <span className="material-symbols-outlined">add</span>
-            Book Appointment
-          </button>
-        </header>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {appointments.length > 0 ? (
-            appointments.map((app) => (
-              <div
-                key={app.id}
-                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 card-hover"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-teal-800">
-                    {app.doctor}
-                  </h3>
-                  <span className="material-symbols-outlined text-teal-500">
-                    {app.mode === "Video Call" ? "videocam" : "local_hospital"}
-                  </span>
+            <Calendar /> Dashboard
+          </a>
+          <a
+            className={`nav-link ${
+              activeSection === "appointments" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("appointments")}
+          >
+            <Calendar /> Appointments
+          </a>
+          <a
+            className={`nav-link ${
+              activeSection === "history" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("history")}
+          >
+            <Heart /> Health History
+          </a>
+          <a
+            className={`nav-link ${
+              activeSection === "profile" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("profile")}
+          >
+            <User /> Profile
+          </a>
+        </nav>
+        <div className="logout">
+          <a className="nav-link logout-link">
+            <LogOut /> Logout
+          </a>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="main-content">
+        {/* Dashboard Section */}
+        {activeSection === "dashboard" && (
+          <div className="section">
+            <header className="section-header">
+              <h2>Welcome, {userData.name.split(" ")[0]}</h2>
+              <p>Track your appointments and health history easily.</p>
+              <p className="datetime">{formatDateTime(currentTime)}</p>
+            </header>
+            <div className="dashboard-grid">
+              <div className="card">
+                <div className="card-header">
+                  <h3>Upcoming Appointment</h3>
+                  {upcomingAppointment?.mode === "Video Call" ? (
+                    <Video className="icon" />
+                  ) : (
+                    <Hospital className="icon" />
+                  )}
                 </div>
-                <p className="text-gray-500">{app.specialty}</p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Date:{" "}
-                  <span className="font-medium text-teal-800">
-                    {formatDate(app.date)}
-                  </span>
-                </p>
-                <p className="text-sm text-gray-500">
-                  Time:{" "}
-                  <span className="font-medium text-teal-800">{app.time}</span>
-                </p>
-                <p className="text-sm text-gray-500">
-                  Mode:{" "}
-                  <span className="font-medium text-teal-800">{app.mode}</span>
-                </p>
-                <p className="text-sm text-gray-500">
-                  Reason:{" "}
-                  <span className="font-medium text-teal-800">
-                    {app.reason || "Not specified"}
-                  </span>
-                </p>
+                <div className="card-body">
+                  <p className="doctor-name">
+                    {upcomingAppointment
+                      ? `Dr. ID ${upcomingAppointment.doctor_id}`
+                      : "No Upcoming Appointments"}
+                  </p>
+                  <p className="specialty">
+                    {upcomingAppointment?.specialty || ""}
+                  </p>
+                </div>
+                {upcomingAppointment && (
+                  <div className="card-footer">
+                    <p>
+                      <span>Date:</span>{" "}
+                      {formatDate(upcomingAppointment.appointment_date)},{" "}
+                      {upcomingAppointment.appointment_time}
+                    </p>
+                    <p>
+                      <span>Mode:</span> {upcomingAppointment.mode}
+                    </p>
+                  </div>
+                )}
                 <button
-                  className="w-full mt-4 text-sm font-semibold text-red-600 hover:bg-red-50 py-2 rounded-lg transition-colors"
-                  onClick={() => cancelAppointment(app.id)}
+                  className="btn-primary"
+                  onClick={() => setActiveSection("appointments")}
                 >
-                  Cancel Appointment
+                  View Details
                 </button>
               </div>
-            ))
-          ) : (
-            <div className="col-span-2 text-center py-8 text-gray-500">
-              No appointments found.{" "}
-              <button
-                onClick={() => navigate("/appointment")}
-                className="text-teal-600 hover:underline"
-              >
-                Book one now
-              </button>
-              .
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
 
-  const renderProfile = () => {
-    return (
-      <div>
-        <header className="mb-8">
-          <h2 className="text-4xl font-bold text-teal-800">Profile Settings</h2>
-          <p className="text-gray-500 mt-1">
-            Manage your personal information.
-          </p>
-        </header>
-        <div className="max-w-2xl">
-          <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 card-hover">
-            <form className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-teal-800 mb-2">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  // defaultValue="Alex Johnson"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none input-focus"
-                />
+              <div className="card">
+                <h3>Health Tips</h3>
+                <div className="health-tips">
+                  {healthTips.map((tip, idx) => (
+                    <div key={idx} className="tip">
+                      <div className="tip-icon">{tip.icon}</div>
+                      <div>
+                        <p className="tip-title">{tip.title}</p>
+                        <p className="tip-desc">{tip.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button className="btn-secondary" onClick={refreshHealthTips}>
+                  Refresh Tips
+                </button>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-teal-800 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  defaultValue="alex.johnson@email.com"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none input-focus"
-                />
+
+              <div className="card">
+                <h3>Past Visits</h3>
+                <ul className="visits-list">
+                  {pastVisits.slice(0, 3).map((visit, idx) => (
+                    <li key={idx}>
+                      <div>
+                        <p className="visit-doctor">{visit.doctor}</p>
+                        <p className="visit-type">{visit.type}</p>
+                      </div>
+                      <p className="visit-date">{formatDate(visit.date)}</p>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  className="btn-secondary"
+                  onClick={() => setActiveSection("history")}
+                >
+                  View All
+                </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Appointments Section */}
+        {activeSection === "appointments" && (
+          <div className="section">
+            <header className="section-header with-action">
+              <div>
+                <h2>Appointments</h2>
+                <p>Manage your upcoming and past appointments.</p>
+              </div>
+
               <button
-                type="submit"
-                className="w-full bg-teal-600 text-white py-3 rounded-lg hover:bg-teal-500 transition-colors font-semibold"
+                className="btn-primary"
+                onClick={() => setShowBookingModal(true)}
               >
-                Save Changes
+                <Plus size={20} />
+                <Link to="/appointment"> Book Appointment</Link>
+              </button>
+            </header>
+            <div className="appointments-grid">
+              {appointments.length === 0 ? (
+                <div className="empty-state">
+                  No appointments found.{" "}
+                  <span onClick={() => setShowBookingModal(true)}>
+                    Book one now
+                  </span>
+                  .
+                </div>
+              ) : (
+                appointments.map((appointment) => (
+                  <div key={appointment.id} className="card">
+                    <div className="card-header">
+                      <h3>{`Dr. ID ${appointment.doctor_id}`}</h3>
+                      {appointment.mode === "Video Call" ? (
+                        <Video className="icon" />
+                      ) : (
+                        <Hospital className="icon" />
+                      )}
+                    </div>
+                    <p className="specialty">{appointment.specialty}</p>
+                    <div className="appointment-details">
+                      <p>
+                        <span>Date:</span>{" "}
+                        {formatDate(appointment.appointment_date)}
+                      </p>
+                      <p>
+                        <span>Time:</span> {appointment.appointment_time}
+                      </p>
+                      <p>
+                        <span>Mode:</span> {appointment.mode}
+                      </p>
+                      <p>
+                        <span>Reason:</span>{" "}
+                        {appointment.reason || "Not specified"}
+                      </p>
+                    </div>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => cancelAppointment(appointment.id)}
+                    >
+                      Cancel Appointment
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Health History Section */}
+        {activeSection === "history" && (
+          <div className="section">
+            <header className="section-header">
+              <h2>Health History</h2>
+              <p>Review your complete medical history.</p>
+            </header>
+            <div className="search-box">
+              <Search size={20} />
+              <input
+                type="text"
+                placeholder="Search visits..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Doctor</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredHistory.map((item, idx) => (
+                    <tr key={idx}>
+                      <td>{item.doctor}</td>
+                      <td>{item.type || item.specialty}</td>
+                      <td>{formatDate(item.date)}</td>
+                      <td>{item.notes || item.reason || "No notes"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Profile Section */}
+        {activeSection === "profile" && (
+          <div className="section">
+            <header className="section-header">
+              <h2>Profile Settings</h2>
+              <p>Manage your personal information.</p>
+            </header>
+            <div className="profile-container">
+              <div className="card profile-card">
+                <div className="profile-header">
+                  <div className="profile-avatar">
+                    <User size={48} />
+                  </div>
+                  <div>
+                    <h3>{userData.name}</h3>
+                    <p>Patient ID: {userData.patientId}</p>
+                  </div>
+                </div>
+                <form onSubmit={updateProfile} className="profile-form">
+                  <div className="form-group">
+                    <label>Full Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      defaultValue={userData.name}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      defaultValue={userData.email}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      defaultValue={userData.phone}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Date of Birth</label>
+                    <input
+                      type="date"
+                      name="dob"
+                      defaultValue={userData.dob}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Blood Type</label>
+                    <select name="bloodType" defaultValue={userData.bloodType}>
+                      <option>A+</option>
+                      <option>A-</option>
+                      <option>B+</option>
+                      <option>B-</option>
+                      <option>AB+</option>
+                      <option>AB-</option>
+                      <option>O+</option>
+                      <option>O-</option>
+                    </select>
+                  </div>
+                  <button type="submit" className="btn-primary">
+                    Save Changes
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Booking Modal */}
+      {showBookingModal && (
+        <div className="modal" onClick={() => setShowBookingModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Book Appointment</h3>
+              <button onClick={() => setShowBookingModal(false)}>
+                <X />
+              </button>
+            </div>
+            <form onSubmit={handleBookAppointment}>
+              <div className="form-group">
+                <label>Doctor</label>
+                <select name="doctor" required>
+                  <option value="">Select a doctor</option>
+                  {doctors.map((doc, idx) => (
+                    <option key={idx} value={doc.value}>
+                      {doc.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  min={new Date().toISOString().split("T")[0]}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Time</label>
+                <input type="time" name="time" required />
+              </div>
+              <div className="form-group">
+                <label>Mode</label>
+                <select name="mode" required>
+                  <option value="Video Call">Video Call</option>
+                  <option value="In-Person">In-Person</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Reason</label>
+                <textarea
+                  name="reason"
+                  rows="3"
+                  placeholder="Brief description..."
+                ></textarea>
+              </div>
+              <button type="submit" className="btn-primary">
+                Confirm Booking
               </button>
             </form>
           </div>
         </div>
-      </div>
-    );
-  };
+      )}
 
-  const navLinkClasses = (section) =>
-    `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
-      activeSection === section
-        ? "bg-teal-600/10 text-teal-600 font-semibold"
-        : "hover:bg-teal-600/10 hover:text-teal-600"
-    }`;
-
-  return (
-    <>
-      <link
-        href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-        rel="stylesheet"
-      />
-      <style>
-        {`
-          .dashboard-container {
-            background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
-          }
-          .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-          }
-          .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-          }
-          .input-focus {
-            transition: all 0.3s ease;
-          }
-          .input-focus:focus {
-            box-shadow: 0 0 10px rgba(13, 148, 136, 0.3);
-            border-color: #0D9488;
-          }
-          .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #fff;
-            border: 1px solid #14B8A6;
-            border-radius: 8px;
-            padding: 12px 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 1000;
-          }
-          .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-          }
-          .sidebar {
-            background: #fff;
-            border-right: 1px solid #E0F2FE;
-          }
-          .nav-icon {
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-          }
-          .header-title {
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-          }
-        `}
-      </style>
-      <div className="dashboard-container flex min-h-screen text-gray-800 font-sans">
-        <aside className="w-64 sidebar flex flex-col p-6">
-          <div className="flex items-center gap-2 mb-10">
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 500 400"
-              xmlns="http://www.w3.org/2000/svg"
-              className="nav-icon"
-            >
-              <circle cx="250" cy="200" r="150" fill="#BAE6FD" opacity="0.5" />
-              <rect
-                x="180"
-                y="150"
-                width="60"
-                height="100"
-                rx="5"
-                fill="#0D9488"
-              />
-              <circle cx="210" cy="120" r="25" fill="#FEF3C7" />
-              <text
-                x="150"
-                y="100"
-                fontSize="30"
-                fill="#14B8A6"
-                fontWeight="bold"
-              >
-                +
-              </text>
-            </svg>
-            <h1 className="text-xl font-bold text-teal-800">Care Connect</h1>
-          </div>
-          <nav className="flex flex-col gap-2 flex-grow">
-            <button
-              className={navLinkClasses("dashboard")}
-              onClick={() => handleNavClick("dashboard")}
-            >
-              <span className="material-symbols-outlined text-teal-500 nav-icon">
-                dashboard
-              </span>{" "}
-              Dashboard
-            </button>
-            <button
-              className={navLinkClasses("appointments")}
-              onClick={() => handleNavClick("appointments")}
-            >
-              <span className="material-symbols-outlined text-teal-500 nav-icon">
-                calendar_month
-              </span>{" "}
-              Appointments
-            </button>
-            <button
-              className={navLinkClasses("profile")}
-              onClick={() => handleNavClick("profile")}
-            >
-              <span className="material-symbols-outlined text-teal-500 nav-icon">
-                person
-              </span>{" "}
-              Profile
-            </button>
-          </nav>
-        </aside>
-        <main className="flex-1 p-8">
-          {activeSection === "dashboard" && renderDashboard()}
-          {activeSection === "appointments" && renderAppointments()}
-          {activeSection === "profile" && renderProfile()}
-        </main>
-
-        {/* Toast Notification */}
-        <div className={`toast ${showToast ? "show" : ""}`}>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-teal-600">
-              check_circle
-            </span>
-            <p className="font-medium text-teal-800">{toastMessage}</p>
-          </div>
+      {/* Toast */}
+      {toast.show && (
+        <div className="toast">
+          <CheckCircle />
+          <p>{toast.message}</p>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 
