@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+models/saved_models/
+config/config.yaml
+.env
