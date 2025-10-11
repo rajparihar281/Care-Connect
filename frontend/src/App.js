@@ -15,6 +15,7 @@ import "./App.css";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import DashboardPage from "./pages/DashboardPage";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="symptom-checker" element={<SymptomChecker />} />
+              <Route path="dashboard" element={<DashboardPage />} />
               <Route path="appointment" element={<Appointment />} />
                   <Route path="emergency-alert" element={<EmergencyAlert />} />
               <Route path="health-notices" element={<HealthNotices />} />
