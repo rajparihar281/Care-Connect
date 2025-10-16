@@ -57,7 +57,7 @@ const Footer = () => {
               </li>
               <li>
                 <a href="#">
-                  <i className="fab fa-twitter"></i> Twitter
+                  <i className="fab fa-twitter"></i> X
                 </a>
               </li>
               <li>
