@@ -26,10 +26,8 @@ const supabaseUrl = "https://kttmrlnuaxrmknuizddc.supabase.co";
 const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0dG1ybG51YXhybWtudWl6ZGRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMjcwMDYsImV4cCI6MjA3NTYwMzAwNn0.Qh5gEm9xdvtzrnS1o4iXfZWySH3_lSIvMiDA2-aHum8";
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-// In a real app, you would get the current user's ID from authentication.
-// For this example, we'll hardcode a UUID that exists in your database.
-const currentPatientId = "550e8400-e29b-41d4-a716-446655440003"; // Example: Jane Smith's ID from your SQL
+.
+const currentPatientId = "550e8400-e29b-41d4-a716-446655440003"; 
 
 const DashboardPage = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
