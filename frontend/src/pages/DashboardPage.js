@@ -221,9 +221,6 @@ const DashboardPage = () => {
 
     const newAppointment = {
       patient_id: currentPatientId,
-      // NOTE: Your schema expects a doctor_id (UUID). Inserting a name will fail
-      // if the column type is UUID. This is a simplification for the example.
-      // You would need to fetch doctors with their IDs to do this properly.
       appointment_date: formData.get("date"),
       appointment_time: formData.get("time"),
       mode: formData.get("mode"),
@@ -260,8 +257,6 @@ const DashboardPage = () => {
 
   const updateProfile = async (e) => {
     e.preventDefault();
-    // This function assumes your 'patients' table has these specific columns.
-    // Adjust formData.get() names and the update object to match your schema.
     const formData = new FormData(e.target);
     const [firstName, ...lastName] = formData.get("name").split(" ");
 
