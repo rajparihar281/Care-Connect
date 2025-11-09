@@ -60,7 +60,7 @@ const AdminDashboard = () => {
 
   // Chart Initialization and Updates
   useEffect(() => {
-    if (loading) return; // Don't create charts until data is loaded
+    if (loading) return; 
 
     // User Distribution Chart
     if (userChartInstance.current) userChartInstance.current.destroy();
