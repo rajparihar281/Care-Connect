@@ -5,7 +5,6 @@ const Footer = () => {
     <>
       <footer className="footer">
         <div className="footer-container">
-          {/* ... (footer content remains the same as your original file) ... */}
           <div className="footer-section">
             <h4>About Care Connect</h4>
             <p style={{ color: "var(--text-light)" }}>
